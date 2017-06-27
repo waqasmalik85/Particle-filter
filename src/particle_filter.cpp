@@ -20,16 +20,18 @@
 
 using namespace std;
 
+//#define FILEWRITE
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// TODO: Set the number of particles. Initialize all particles to first position (based on estimates of
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1.
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-
-	//ofstream file;
-	//file.open ("codebind.txt");
-	//file << "Entering Init \n";
-	//file.close();
+#ifdef FILEWRITE
+	ofstream file;
+	file.open ("codebind.txt");
+	file << "Entering Init \n";
+	file.close();
+#endif
 	num_particles = 10;
 	double std_x = std[0];
 	double std_y = std[1];
@@ -54,17 +56,20 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 			particles[i].weight = 1;
 			particles[i].id = i + 1;
 			weights[i] = 1;
-			//file.open ("codebind.txt",std::fstream::app);
-			//file<<"Particle No. "<<i + 1<<"  "<<"x= "<<particles[i].x<<"	"<<"y= "<<particles[i].y<<"	"<<"Theta= "<<particles[i].theta<<"	"<<"Weight= "<<particles[i].weight <<endl;
-			//file.close();
+#ifdef FILEWRITE
+			file.open ("codebind.txt",std::fstream::app);
+			file<<"Particle No. "<<i + 1<<"  "<<"x= "<<particles[i].x<<"	"<<"y= "<<particles[i].y<<"	"<<"Theta= "<<particles[i].theta<<"	"<<"Weight= "<<particles[i].weight <<endl;
+			file.close();
+#endif
 		}
 		is_initialized = true;
 
 	}
-	//ofstream file;
-		  		//file.open ("codebind.txt",std::fstream::app);
-		  		//file << "Exiting Init \n";
-		  		//file.close();
+#ifdef FILEWRITE
+	file.open ("codebind.txt",std::fstream::app);
+	file << "Exiting Init \n";
+	file.close();
+#endif
 
 }
 
@@ -73,10 +78,12 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	// NOTE: When adding noise you may find std::normal_distribution and std::default_random_engine useful.
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
-	/*ofstream file;
-		  		file.open ("codebind.txt",std::fstream::app);
-		  		file << "Entering Prediction \n";
-		  		file.close();*/
+#ifdef FILEWRITE
+	ofstream file;
+	file.open ("codebind.txt",std::fstream::app);
+	file << "Entering Prediction \n";
+	file.close();
+#endif
 	double std_x = std_pos[0];
     double std_y = std_pos[1];
     double std_theta = std_pos[2];
@@ -111,11 +118,18 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     	particles[i].x = x_new + dist_x(generator2);
     	particles[i].y = y_new + dist_y(generator2);
     	particles[i].theta = theta_new + dist_theta(generator2);
+
+#ifdef FILEWRITE
+    	file.open ("codebind.txt",std::fstream::app);
+    	file<<"Particle No. "<<i + 1<<"  "<<"x= "<<particles[i].x<<"	"<<"y= "<<particles[i].y<<"	"<<"Theta= "<<particles[i].theta<<"	"<<"Weight= "<<particles[i].weight <<endl;
+    	file.close();
+#endif
     }
-    /*ofstream file;
+#ifdef FILEWRITE
     	  		file.open ("codebind.txt",std::fstream::app);
     	  		file << "Exiting prediction \n";
-    	  		file.close();*/
+    	  		file.close();
+#endif
 }
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
@@ -123,10 +137,12 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	//   observed measurement to this particular landmark.
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to
 	//   implement this method and use it as a helper during the updateWeights phase.
-	/*ofstream file;
-		  		file.open ("codebind.txt",std::fstream::app);
-		  		file << "Entering data Association \n";
-		  		file.close();*/
+#ifdef FILEWRITE
+	ofstream file;
+	file.open ("codebind.txt",std::fstream::app);
+	file << "Entering data Association \n";
+	file.close();
+#endif
 	double nearest_dist,o_x,o_y,pred_x,pred_y;
 	for (int i = 0;i < observations.size();i++)
 	{
@@ -144,10 +160,11 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 			}
 		}
 	}
-	/*ofstream file;
+#ifdef FILEWRITE
 		  		file.open ("codebind.txt",std::fstream::app);
 		  		file << "Exiting dataAssociation \n";
-		  		file.close();*/
+		  		file.close();
+#endif
 
 }
 
@@ -164,10 +181,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
 
-	/*ofstream file;
-		  		file.open ("codebind.txt",std::fstream::app);
-		  		file << "Entering updateWeights \n";
-		  		file.close();*/
+#ifdef FILEWRITE
+	ofstream file;
+	file.open ("codebind.txt",std::fstream::app);
+	file << "Entering updateWeights \n";
+	file.close();
+#endif
 	double std_x = std_landmark[0];
 	double std_y = std_landmark[1];
 
@@ -235,31 +254,52 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 				{
 					landmark_x = inrange_landmarks[n].x;
 					landmark_y = inrange_landmarks[n].y;
-					/*file.open ("codebind.txt",std::fstream::app);
+#ifdef FILEWRITE
+					file.open ("codebind.txt",std::fstream::app);
 					file<<"Landmark ID. "<<inrange_landmarks[n].id <<endl;
 					file<<"Transformed Obs. x= "<<o_x<<  "	Transformed Obs. y= "<<o_y<<endl;
 					file<<"Landmark x= "<<landmark_x<<  "	Landmark y= "<<landmark_y<<endl;
-					file.close();*/
+					file.close();
+#endif
 					break;
 				}
 
 			}
 			dx = o_x - landmark_x;
 			dy = o_y - landmark_y;
-			double d1 = dx*dx/(2*std_x*std_x);
-			double d2 = dy*dy/(2*std_y*std_y);
-			double p = (1/(2*M_PI*std_x*std_y))*exp(-(d1 + d2));
+#ifdef FILEWRITE
+			file.open ("codebind.txt",std::fstream::app);
+			file<<"Difference x = "<<dx<<  "	Difference y = "<<dy<<endl;
+#endif
+			double d1 = (dx*dx)/(2.0*std_x*std_x);
+			double d2 = (dy*dy)/(2.0*std_y*std_y);
+			double p = (0.5/(M_PI*std_x*std_y))*exp(-(d1 + d2));
+#ifdef FILEWRITE
+			file<<"Instantaneous Probability = "<<p<< endl;
+#endif
 			particles[i].weight = particles[i].weight * p;
+			//weight = weight*p;
+#ifdef FILEWRITE
+			file<<"Cumulative Probability = "<<particles[i].weight << endl;
+			file.close();
+#endif
 		}
+		//particles[i].weight = particles[i].weight*weight;
 		weights.push_back(particles[i].weight);
-		/*file.open ("codebind.txt",std::fstream::app);
+#ifdef FILEWRITE
+		file.open ("codebind.txt",std::fstream::app);
+		file<<"Final probability = "<<particles[i].weight<<endl;
+		file.close();
+		file.open ("codebind.txt",std::fstream::app);
 		file<<"Particle No. "<<i + 1<<"  "<<"x= "<<particles[i].x<<"	"<<"y= "<<particles[i].y<<"	"<<"Theta= "<<particles[i].theta<<"	"<<"Weight= "<<particles[i].weight <<endl;
-		file.close();*/
+		file.close();
+#endif
 	}
-	/*ofstream file;
+#ifdef FILEWRITE
 		  		file.open ("codebind.txt",std::fstream::app);
 		  		file << "Exiting updateWeights \n";
-		  		file.close();*/
+		  		file.close();
+#endif
 }
 
 void ParticleFilter::resample() {
@@ -267,10 +307,12 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	//std::discrete_distribution<int> dist_ind(particles[0].weight, particles[num_particles -1].weight);
-	/*ofstream file;
-		  		file.open ("codebind.txt",std::fstream::app);
-		  		file << "Entering Resample \n";
-		  		file.close();*/
+#ifdef FILEWRITE
+	ofstream file;
+	file.open ("codebind.txt",std::fstream::app);
+	file << "Entering Resample \n";
+	file.close();
+#endif
 	std::discrete_distribution<int> dist_ind(weights.begin(), weights.end());
 	std::vector<Particle> new_particles;
 	std::default_random_engine generator3;
@@ -280,17 +322,24 @@ void ParticleFilter::resample() {
 	for (int i = 0; i < num_particles; i++)
 	{
 		index = dist_ind(generator3);
+#ifdef FILEWRITE
+		file.open ("codebind.txt",std::fstream::app);
+		file<<"Particle Id.  = "<<i + 1<<"  Random chosen index. "<<index<<endl;
+		file.close();
+#endif
 		Particle p;
 		p = particles[index];
+		p.id = i + 1;
 		new_particles.push_back(p);
 	}
 	particles = new_particles;
-	/*ofstream file;
+#ifdef FILEWRITE
 		  		file.open ("codebind.txt",std::fstream::app);
 		  		file << "Exiting Resample \n";
 		  		file << "Cycle completed \n";
 		  		file << "\n";
-		  		file.close();*/
+		  		file.close();
+#endif
 }
 
 Particle ParticleFilter::SetAssociations(Particle particle, std::vector<int> associations, std::vector<double> sense_x, std::vector<double> sense_y)
