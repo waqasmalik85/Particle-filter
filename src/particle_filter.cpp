@@ -32,7 +32,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	file << "Entering Init \n";
 	file.close();
 #endif
-	num_particles = 10;
+	num_particles = 10; // Less than that causes wrong estimations, more than that is too much computation
 	double std_x = std[0];
 	double std_y = std[1];
 	double std_theta = std[2];
@@ -206,11 +206,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		LandmarkObs g_obs,g_landmark;
 
 		//double weight = 1;
-		particles[i].weight = 1;
+		particles[i].weight = 1; // Setting weights bck to 1
 
 		for (int j = 0; j < observations.size(); j++)
 		{
-			global_x = (observations[j].x*cos(p_theta) - observations[j].y*sin(p_theta)) + p_x;
+			global_x = (observations[j].x*cos(p_theta) - observations[j].y*sin(p_theta)) + p_x; // Transformation into MAP coordinate system
 			global_y = (observations[j].x*sin(p_theta) + observations[j].y*cos(p_theta)) + p_y;
 			//obs_dist = dist(0,0,global_x,global_y);
 			if (true) // obs_dist < sensor_range
@@ -228,7 +228,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			l_x = map_landmarks.landmark_list[k].x_f;
 			l_y = map_landmarks.landmark_list[k].y_f;
 			landmark_dist = dist(p_x,p_y,l_x,l_y);
-			if (landmark_dist < sensor_range)
+			if (landmark_dist < sensor_range) // Considering only the landmarks with in sensor range
 			{
 				g_landmark.x = l_x;
 				g_landmark.y = l_y;
@@ -237,7 +237,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			}
 		}
 
-		dataAssociation(inrange_landmarks,global_observations);
+		dataAssociation(inrange_landmarks,global_observations); // Associate ovservations to landmarks
 
 		double o_x, o_y, landmark_x, landmark_y,dx,dy;
 		int o_id, landmark_id;
@@ -261,7 +261,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 					file<<"Landmark x= "<<landmark_x<<  "	Landmark y= "<<landmark_y<<endl;
 					file.close();
 #endif
-					break;
+					break; // We have found the associated landmark, no need to loop further
 				}
 
 			}
@@ -273,11 +273,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 #endif
 			double d1 = (dx*dx)/(2.0*std_x*std_x);
 			double d2 = (dy*dy)/(2.0*std_y*std_y);
-			double p = (0.5/(M_PI*std_x*std_y))*exp(-(d1 + d2));
+			double p = (0.5/(M_PI*std_x*std_y))*exp(-(d1 + d2)); // Bivariate pdf of an observation-landmark pair 
 #ifdef FILEWRITE
 			file<<"Instantaneous Probability = "<<p<< endl;
 #endif
-			particles[i].weight = particles[i].weight * p;
+			particles[i].weight = particles[i].weight * p; // Cummulative weight
 			//weight = weight*p;
 #ifdef FILEWRITE
 			file<<"Cumulative Probability = "<<particles[i].weight << endl;
@@ -321,7 +321,7 @@ void ParticleFilter::resample() {
 	int index;
 	for (int i = 0; i < num_particles; i++)
 	{
-		index = dist_ind(generator3);
+		index = dist_ind(generator3); // Indices with higher weights should be choosen more often
 #ifdef FILEWRITE
 		file.open ("codebind.txt",std::fstream::app);
 		file<<"Particle Id.  = "<<i + 1<<"  Random chosen index. "<<index<<endl;
@@ -332,7 +332,7 @@ void ParticleFilter::resample() {
 		p.id = i + 1;
 		new_particles.push_back(p);
 	}
-	particles = new_particles;
+	particles = new_particles; // updated particle list
 #ifdef FILEWRITE
 		  		file.open ("codebind.txt",std::fstream::app);
 		  		file << "Exiting Resample \n";
